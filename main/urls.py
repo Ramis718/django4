@@ -8,4 +8,7 @@ urlpatterns = [
     path('api/v1/data/', views.index),
     path('api/v1/product/', views.product_list_view),
     path('api/v1/product/<int:id>/', views.product_datail_view),
+    path('api/v1/products/tags/', views.product_tag),
+    path('api/v1/products/reviews/', views.product_reviews)
+
 ]

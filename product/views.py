@@ -1,8 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework  import status
-from .serializers import ProductSerializer, ProductDatailSerializer
-from .models import  Product
+from .serializers import ProductSerializer, ProductDatailSerializer, ReviewSerializer, TagSerializer
+from .models import  Product, Review, Tag
 
 @api_view(['GET'])
 def index(request):
@@ -30,3 +30,18 @@ def product_datail_view(request, id):
         return Response(status=status.HTTP_404_NOT_FOUND, data={'error': 'Product not found!'})
     data = ProductDatailSerializer(product, many=False).data
     return Response(data=data)
+
+@api_view(['GET'])
+def product_reviews(requesr):
+    rew = Review.objects.all()
+    data = ReviewSerializer(rew, many=True).data
+    return Response(data=data) 
+
+@api_view(['GET'])
+def product_tag(request, id):
+    try:
+        ta = Tag.objects.get(id=id)
+    except Tag.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND, data={'error': 'tag not'})   
+    data = TagSerializer(ta, many=False).data
+    return Response(data=data)      
