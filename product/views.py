@@ -16,32 +16,34 @@ def index(request):
     return Response(data=context)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def product_list_view(request):
-    product = Product.objects.all()
-    data = ProductSerializer(product, many=True).data
-    return Response(data=data)
+    if request.method == 'GET':
+        product = Product.objects.all()
+        data = ProductSerializer(product, many=True).data
+        return Response(data=data)
+    elif request.method == 'POST':
+        name = request.data['name']
+        description = request.data.get('description', '')
+        duration = request.data['duration']
+        is_active = request.data['is_active']
+        tag = request.data['tag']
+        product = Product.objects.create(
+            name=name, description=description, duration=duration, is_active=is_active)
+        
+        product.tag.set(tag)
 
-@api_view(['GET'])
+        return Response(data=ProductSerializer(product).data, status=status.HTTP_201_CREATED)
+        
+@api_view(['GET', 'DELETE'])
 def product_datail_view(request, id):
     try:
         product= Product.objects.get(id=id)
     except Product.DoesNotExist:    
         return Response(status=status.HTTP_404_NOT_FOUND, data={'error': 'Product not found!'})
-    data = ProductDatailSerializer(product, many=False).data
-    return Response(data=data)
-
-@api_view(['GET'])
-def product_reviews(requesr):
-    rew = Review.objects.all()
-    data = ReviewSerializer(rew, many=True).data
-    return Response(data=data) 
-
-@api_view(['GET'])
-def product_tag(request, id):
-    try:
-        ta = Tag.objects.get(id=id)
-    except Tag.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND, data={'error': 'tag not'})   
-    data = TagSerializer(ta, many=False).data
-    return Response(data=data)      
+    if request.method == 'GET':
+        data = ProductDatailSerializer(product, many=False).data
+        return Response(data=data)
+    elif request.method == 'DELETE':
+        product.delete()    
+        return Response(data={'message': 'delete product'})

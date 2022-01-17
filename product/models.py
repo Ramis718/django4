@@ -20,8 +20,10 @@ class Tag(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    tag = models.ManyToManyField(Tag, blank = True)
+    is_active = models.BooleanField()
+    duration = models.IntegerField()
+    # category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    tag = models.ManyToManyField(Tag, blank = True, null=True)
 
     def cout_tag(self):
         return self.tag.filter(is_active=True).count()
