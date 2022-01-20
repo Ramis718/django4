@@ -1,8 +1,9 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework  import status
-from .serializers import ProductSerializer, ProductDatailSerializer, ReviewSerializer, TagSerializer
-from .models import  Product, Review, Tag
+from .serializers import ProductSerializer, ProductDatailSerializer, ReviewSerializer, TagSerializer, ProductCreateSerializer
+from .models import  Product
+from distutils import errors
 
 @api_view(['GET'])
 def index(request):
@@ -23,11 +24,16 @@ def product_list_view(request):
         data = ProductSerializer(product, many=True).data
         return Response(data=data)
     elif request.method == 'POST':
-        name = request.data['name']
-        description = request.data.get('description', '')
-        duration = request.data['duration']
-        is_active = request.data['is_active']
-        tag = request.data['tag']
+        print('request.data-', request.data)
+        serializer = ProductCreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_406_Not_ACCEPTABLE, data={'errors': serializer.errors})
+        print('validated-', serializer.validated.data)    
+        name = serializer.validated_data['name']
+        description = serializer.validated_data.get('description', '')
+        duration = serializer.validated_data['duration']
+        is_active = serializer.validated_data['is_active']
+        tag = serializer.validated_data['tag']
         product = Product.objects.create(
             name=name, description=description, duration=duration, is_active=is_active)
         
